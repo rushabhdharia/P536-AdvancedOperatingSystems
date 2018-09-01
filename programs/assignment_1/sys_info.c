@@ -33,9 +33,15 @@ int main(int argc, char *argv[])
 		printf("Child PID = %d\n", getpid());
 		close(p[1]);
 		read(p[0], path, sizeof(path));
-		printf("%d \t",a);
-		printf("%s \n", path);
-		execl(path, "", 0);
+		//printf("%d \t",a);
+		//printf("%s \n", path);
+		if(strcmp(path,"/bin/echo")==0)
+		{
+			execl(path, "-c", "\"Hello World!\"", "", 0); //https://stackoverflow.com/questions/32771494/how-can-i-use-execl-function-or-other-kinds-of-exec-functions-to-perform-ech/
+			fprintf(stderr, "Error no = %d\n", errno);
+		}
+		else
+			execl(path, "", 0);
 		close(p[0]);
 	}
 	
