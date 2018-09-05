@@ -1,0 +1,14 @@
+Q1 - What is Orphan and Zombie processes?
+Ans - Orphan Process - It is a process whose parent process has terminated before waiting for its child to terminate. An orphan can be created unintentionally. eg. When a parent process terminates or crashes. It can also be left intentionally so that it can run in the background to complete a long-running job. [1]
+Zombie Process - It is the process that has completed with its execution but has an entry in the process table. A Child process becomes a Zombie process after completion and it has to be removed from the resource table. The 'wait' system call is used in the Parent process to read the exit status of the Child process so that the zombie's entry is removed from the process table. This removal is termed as 'reap'.[2] 
+
+Q2 - What are the changes that occur when the child process calls the exec system call to execute a new program?
+Ans - The exec() system call replaces the process image of the current process(child process) with a new process image(command file). It loads the program in the process space and executes it from the entry point. [3]
+
+Therefore, the text and user data segments of the process that called the exec() system call is replaced by the text and user data contained in the program file whose name is passed as a parameter to exec(). [4]
+
+References
+1. https://www.gmarik.info/blog/2012/orphan-vs-zombie-vs-daemon-processes/
+2. https://en.wikipedia.org/wiki/Zombie_process
+3. https://www.geeksforgeeks.org/difference-fork-exec/
+4. http://www.cems.uwe.ac.uk/~irjohnso/coursenotes/lrc/system/pc/pc4.htm
