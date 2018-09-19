@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <math.h>
 
 typedef struct str_thdata
@@ -44,13 +43,8 @@ int main(int argc, char *argv[])
 	pthread_t threads[n];		// declaring n threads
 	thdata th[n];				// stuct for each thread
 	int rc, t, count;
-
-	//https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
-	struct stat st;				
-	stat(filename, &st);		
-	int size = st.st_size;	
-	//----------------------------------------------------------------------------
-	count = 2*size/n;
+	
+	int size = 0;
 	char *buffer1[n];
 	char *buffer2[n];
 	double counter_d = 0;
@@ -70,9 +64,12 @@ int main(int argc, char *argv[])
 	}
 
 	for (c = getc(fp); c != EOF; c = getc(fp)) 
+	{	
+		size+=1;
         if (c == '\n') 			// Increment count if this character is newline 
             counter_d = counter_d + 1; 
-
+    }
+    count = 2*size/n;
     counter_d = counter_d/n;
 	counter = (int) ceil(counter_d);
 
@@ -84,10 +81,6 @@ int main(int argc, char *argv[])
 		buffer2[t] = NULL;
 		buffer1[t] = (char *) malloc(count);
 		buffer2[t] = (char *) malloc(count);
-	}
-
-	for(t=0;t<n;t++)
-	{
 		newCount = 0;
 		
 		while ((read = getline(&line, &len, fp)) != -1) //https://linux.die.net/man/3/getline
@@ -97,18 +90,14 @@ int main(int argc, char *argv[])
 			if(newCount==counter)
 				break;
 		}
-		//printf("Buffer 1 After = %s", buffer1[t]);
-	free(line);	
+		free(line);
+		th[t].wordToFind = word;
+		th[t].buffer1 = &buffer1[t];
+		th[t].buffer2 = &buffer2[t];
 	}
 
 	for(t=0; t<n; t++)
 	{
-		//printf("Buffer 1 = %s", buffer1[t]);
-		//printf("Buffer 2 = %s", buffer2[t]);
-		//memset(&buffer2[t][0], 0, sizeof(buffer2[t]));
-		th[t].wordToFind = word;
-		th[t].buffer1 = &buffer1[t];
-		th[t].buffer2 = &buffer2[t];
 		rc = pthread_create(&threads[t], NULL, (void *) &Find, (void *) &th[t]);
 		if (rc)
 		{
@@ -123,6 +112,8 @@ int main(int argc, char *argv[])
 	for(t=0;t<n;t++)
 	{
 		printf("%s\n", buffer2[t]);
+		free(buffer1[t]);
+		free(buffer2[t]);
 	}
 
 	fclose(fp);
