@@ -11,6 +11,13 @@ typedef struct str_thdata
 	char **buffer2;
 } thdata;
 
+char* mystrcat( char* dest, char* src )
+{
+     while (*dest) dest++;
+     while (*dest++ = *src++);
+     return --dest;
+}
+
 void *Find(void *ptr)
 {
 	thdata *data;            
@@ -25,8 +32,8 @@ void *Find(void *ptr)
    do {
    		if(strstr(line, word))
 		   {
-			 strcat(buffer2, line);
-			 strcat(buffer2,"\n");
+			 mystrcat(buffer2, line);
+			 mystrcat(buffer2,"\n");
 		   } 
      } while ((line = strtok_r(NULL, "\n", &temp)) != NULL);
 //----------------------------------------------------------------------------------
@@ -85,12 +92,12 @@ int main(int argc, char *argv[])
 		
 		while ((read = getline(&line, &len, fp)) != -1) //https://linux.die.net/man/3/getline
 		{
-			strcat(buffer1[t], line);
+			mystrcat(buffer1[t], line);
 			newCount++;
 			if(newCount==counter)
 				break;
 		}
-		free(line);
+		//free(line);
 		th[t].wordToFind = word;
 		th[t].buffer1 = &buffer1[t];
 		th[t].buffer2 = &buffer2[t];
