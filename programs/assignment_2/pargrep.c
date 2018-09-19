@@ -11,13 +11,6 @@ typedef struct str_thdata
 	char **buffer2;
 } thdata;
 
-char* mystrcat( char* dest, char* src )
-{
-     while (*dest) dest++;
-     while (*dest++ = *src++);
-     return --dest;
-}
-
 void *Find(void *ptr)
 {
 	thdata *data;            
@@ -32,8 +25,8 @@ void *Find(void *ptr)
    do {
    		if(strstr(line, word))
 		   {
-			 mystrcat(buffer2, line);
-			 mystrcat(buffer2,"\n");
+			 strcat(buffer2, line);
+			 strcat(buffer2,"\n");
 		   } 
      } while ((line = strtok_r(NULL, "\n", &temp)) != NULL);
 //----------------------------------------------------------------------------------
@@ -43,6 +36,7 @@ void *Find(void *ptr)
 
 int main(int argc, char *argv[])
 {
+	printf("I am here");	
 	FILE *fp;					//file pointer
 	int n = atoi(argv[1]);		//number of threads
 	char *word = argv[2];		//word to find	
@@ -62,6 +56,8 @@ int main(int argc, char *argv[])
     ssize_t read;
 	size_t len = 0;
 	char *line = NULL;
+
+	
 
     fp = fopen(filename, "r");
     if (fp == NULL)
@@ -84,20 +80,24 @@ int main(int argc, char *argv[])
 
 	for (t=0;t<n;t++)
 	{
+		printf("t = %d n = %d", t, n);
 		buffer1[t] = NULL;
 		buffer2[t] = NULL;
-		buffer1[t] = (char *) malloc(count);
-		buffer2[t] = (char *) malloc(count);
+		buffer1[t] = (char *) malloc(count*sizeof(char));
+		buffer2[t] = (char *) malloc(count*sizeof(char));
 		newCount = 0;
 		
 		while ((read = getline(&line, &len, fp)) != -1) //https://linux.die.net/man/3/getline
 		{
-			mystrcat(buffer1[t], line);
+			
+			strcat(buffer1[t], line);
+			//printf("%s", buffer1[t]);
 			newCount++;
 			if(newCount==counter)
 				break;
 		}
-		//free(line);
+		//printf("%s",buffer1[t]);
+		free(line);
 		th[t].wordToFind = word;
 		th[t].buffer1 = &buffer1[t];
 		th[t].buffer2 = &buffer2[t];
