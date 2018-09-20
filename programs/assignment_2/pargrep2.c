@@ -8,9 +8,10 @@ typedef struct str_thdata
 {
 	char *wordToFind;
 	FILE *fileinput;
-	FILE *fileoutput;
 	int th_no;
 	int counter;
+	char **buffer;
+	int size;
 } thdata;
 
 void *Find(void *ptr)
@@ -19,9 +20,10 @@ void *Find(void *ptr)
     data = (thdata *) ptr; 
     char *word = data->wordToFind;
     FILE *fileinput = data->fileinput;
-    FILE *fileoutput = data->fileoutput;
+    char *buffer = *data->buffer;
     int no = data->th_no;
     int counter = data->counter;
+    int size = data->size;
     int counter1;
     int newCount = 0;
     int i;
@@ -37,7 +39,7 @@ void *Find(void *ptr)
     while ((read = getline(&line, &len, fileinput)) != -1)
     {
     	if(strstr(line, word))
-    		fprintf(fileoutput, "%s", line);
+    		strcat(buffer, line);
     	newCount++;
     	if(newCount==counter)
     		break;
@@ -47,13 +49,15 @@ void *Find(void *ptr)
 
 int main(int argc, char **argv)
 {
-	int n;//number of threads
-	char *word;		//word to find	
-	char *filename; 	// filename
+	int n;						//number of threads
+	char *word;					//word to find	
+	char *filename; 			// filename
 	filename = NULL;
 	word = NULL;
 	word = malloc(20*sizeof(char));
 	filename=malloc(20*sizeof(char));
+	char *buffer[n];
+
 	if (argc==2)
 	{
 		n = 5;
@@ -74,9 +78,7 @@ int main(int argc, char **argv)
 	}
 	FILE *fp;
 	FILE *inputFiles[n];
-	FILE *outputFiles[n];
 			
-	char *filename2[n];
 	pthread_t threads[n];		// declaring n threads
 	thdata th[n];				// stuct for each thread
 	int rc, t, count;
@@ -118,11 +120,12 @@ int main(int argc, char **argv)
 
 	for (c = getc(fp); c != EOF; c = getc(fp)) 
 	{	
-		//size+=1;
+		size+=1;
         if (c == '\n') 			// Increment count if this character is newline 
             counter_d = counter_d + 1; 
     }
 
+    size=2*size/n;
     counter_d = counter_d/n;
 	counter = (int) ceil(counter_d);
 	fseek(fp, 0, SEEK_SET);
@@ -130,19 +133,17 @@ int main(int argc, char **argv)
 	for (t = 0; t < n; t++)
 	{
 	   inputFiles[t]=fopen(filename, "r");
-	   filename2[t] = NULL;
-	   filename2[t]=malloc(20*sizeof(char));
-	   sprintf(filename2[t], "filename_%d.txt", t); // puts string into buffer
-	   outputFiles[t]=fopen(filename2[t], "w+");
+	   buffer[t] = malloc(size*sizeof(char));
 	}
 
 	for(t = 0; t<n; t++)
 	{
 		th[t].wordToFind = word;
 		th[t].fileinput = inputFiles[t];
-		th[t].fileoutput = outputFiles[t];
+		th[t].buffer = &buffer[t];
 		th[t].th_no = t;
 		th[t].counter = counter;
+		th[t].size = size;
 	}
 
 	for(t=0; t<n; t++)
@@ -157,29 +158,22 @@ int main(int argc, char **argv)
 
 	for(t=0; t<n; t++)
 		pthread_join(threads[t], NULL);
-
+	
 	for(t=0;t<n;t++)
 	{
-		fseek(outputFiles[t], 0, SEEK_SET);
-		while ((read = getline(&line, &len, outputFiles[t])) != -1)
-		{
-			printf("%s", line);
-		}	
+		printf("%s", buffer[t]);
 	}
-	
+
 	fclose(fp);
 	for(t=0;t<n;t++)
 	{
 		fclose(inputFiles[t]);
-		fclose(outputFiles[t]);
-		remove(filename2[t]);
+		free(buffer[t]);
 	}
 	if(argc==2)
 	{
 		remove(filename);	
 	}
-	
-
 	pthread_exit(NULL);
   	return 0;
 }

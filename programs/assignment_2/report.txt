@@ -1,0 +1,128 @@
+Note: I have submitted 2 files pargrep.c and pargrep2.c. pargrep2.c is the faster implementation which works on my PC running on Ubuntu. pargrep2.c does not run on silo. But when I use the debugger Valgrind on Silo it does show the output.
+pargrep.c is the slower implementation which uses a lot of file i/o. The only difference in pargrep.c and pargrep2.c is the storage of output. pargrep.c stores output of each thread in files and pargrep2.c stores output in buffers.
+Kindly consider pargrep2.c for grading. For the purpose of completion I have implemented pargrep.c which runs on Silo.
+
+Q1) The concurrency design that you chose, and why.
+Ans) 
+Splitting of input file - The input file is split using - (total number of lines in file)/(number of threads)
+
+How many threads to use - In pargrep the overhead of creating files is high therefore number of threads makes a lot of difference
+In pargrep2 Amdahl's law can be observed as shown below. Therefore for a file of size 700KB ~ 1MB using 3-4 threads improves the performance by almost 50% 
+
+Getting Output in Order - In pargrep I've saved the output of each pthread in different files and printing those files after pthread_join, i.e. after waiting for each thread to complete execution.
+In pargrep2 I've saved the output of each pthread in different buffers and printing those buffers after pthread_join, i.e. after waiting for each thread to complete execution.
+
+
+Q2) Compare performance with standard (non-parallel) grep changing the number of threads, etc.
+1. time used by grep on Silo to find word 'the' in file - prideand prejudice.txt 
+real	0m0.024s
+user	0m0.013s
+sys	0m0.007s
+
+2. time used by pargrep on Silo with 
+1 thread
+real	0m0.063s
+user	0m0.010s
+sys	0m0.009s
+
+2 threads
+real	0m0.073s
+user	0m0.009s
+sys	0m0.011s
+
+3 threads
+real	0m0.111s
+user	0m0.010s
+sys	0m0.011s
+
+4 threads
+real	0m0.127s
+user	0m0.009s
+sys	0m0.013s
+
+5 threads
+real	0m0.112s
+user	0m0.008s
+sys	0m0.013s
+
+6 threads
+real	0m0.185s
+user	0m0.012s
+sys	0m0.011s
+
+7 threads
+real	0m0.129s
+user	0m0.011s
+sys	0m0.013s
+
+8 threads
+real	0m0.218s
+user	0m0.010s
+sys	0m0.016s
+
+9 threads
+real	0m0.217s
+user	0m0.013s
+sys	0m0.012s
+
+10 threads
+real	0m0.208s
+user	0m0.015s
+sys	0m0.013s
+
+3. 1. time used by grep on ubuntu(my pc) to find word 'the' in file - prideand prejudice.txt 
+real	0m0.068s
+user	0m0.013s
+sys	0m0.020s
+
+4. time used by pargrep2 on ubuntu with
+1 threads
+real	0m0.069s
+user	0m0.042s
+sys	0m0.015s
+
+2 threads
+real	0m0.085s
+user	0m0.028s
+sys	0m0.009s
+
+3 threads
+real	0m0.036s
+user	0m0.028s
+sys	0m0.009s
+
+4 threads
+real	0m0.036s
+user	0m0.024s
+sys	0m0.010s
+
+5 threads
+real	0m0.046s
+user	0m0.020s
+sys	0m0.016s
+
+6 threads
+real	0m0.046s
+user	0m0.023s
+sys	0m0.008s
+
+7 threads
+real	0m0.045s
+user	0m0.028s
+sys	0m0.010s
+
+
+8 threads
+real	0m0.048s
+user	0m0.018s
+sys	0m0.011s
+
+9 threads
+real	0m0.46s
+user	0m0.024s
+sys	0m0.006s
+
+10 threads
+real	0m0.045s
+user	0m0.026s
+sys	0m0.006s
