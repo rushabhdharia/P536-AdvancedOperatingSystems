@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 	word = NULL;
 	word = malloc(20*sizeof(char));
 	filename=malloc(20*sizeof(char));
-	char *buffer[n];
+	char **buffer;
 
 	if (argc==2)
 	{
@@ -130,6 +130,7 @@ int main(int argc, char **argv)
 	counter = (int) ceil(counter_d);
 	fseek(fp, 0, SEEK_SET);
 
+	buffer = malloc(n * sizeof(char *));
 	for (t = 0; t < n; t++)
 	{
 	   inputFiles[t]=fopen(filename, "r");
@@ -170,6 +171,7 @@ int main(int argc, char **argv)
 		fclose(inputFiles[t]);
 		free(buffer[t]);
 	}
+	free(buffer);
 	if(argc==2)
 	{
 		remove(filename);	
