@@ -6,5 +6,4 @@ void consumer(int);
 void producer(int);
 
 /* Semaphore Declarations */
-extern sid32 produced, consumed;
-  
+extern sid32 produced, consumed; 

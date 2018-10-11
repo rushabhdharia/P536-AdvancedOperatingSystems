@@ -30,7 +30,9 @@ void *Find(void *ptr)
 
     ssize_t read;
 	size_t len = 0;
-	char *line = NULL;
+	char *line;
+	line = NULL;
+	line = malloc(200*sizeof(char));
 
 	counter1 = counter*no;
 	for(i=0;i<counter1;i++)
@@ -44,6 +46,8 @@ void *Find(void *ptr)
     	if(newCount==counter)
     		break;
     }
+    free(line);
+    
     pthread_exit(NULL);
 }
 
@@ -91,7 +95,6 @@ int main(int argc, char **argv)
 
     ssize_t read;
 	size_t len = 0;
-	char *line = NULL;
 
 	if(argc==2)
 	{
@@ -173,11 +176,13 @@ int main(int argc, char **argv)
 		fclose(inputFiles[t]);
 		free(buffer[t]);
 	}
-	free(buffer);
 	if(argc==2)
 	{
 		remove(filename);	
 	}
+	free(buffer);
+	free(filename);
+	free(word);
 	pthread_exit(NULL);
   	return 0;
 }

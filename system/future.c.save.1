@@ -1,0 +1,81 @@
+#include<xinu.h>
+#include <future.h>
+
+struct Queue *newNode(pid32 pid)
+{
+	struct node *temp = (struct node *)getmem(sizeof(struct node));
+	temp->pid = pid;
+	temp->next = NULL;
+	temp->prev = NULL;
+	return temp;
+}
+
+struct node *createQueue()
+{
+	struct Queue *q = (struct Queue *)getmem(sizeof(struct Queue));
+	q->front=NULL;
+	q->rear=NULL;
+}
+
+void enqueue(struct Queue *q, pid32 p)
+{
+	struct node *temp = newNode(p);
+	if(q->rear==NULL)
+	{
+		q->front = q->rear = temp;
+		suspend(p);
+		return;
+	}
+	q->rear->next = temp;
+	temp->prev = q->rear;
+	q->rear = temp
+	suspend(p)
+}
+
+pid32 dequeue(struct Queue *q)
+{
+	
+}
+
+future_t* future_alloc(future_mode_t mode)
+{
+	
+	future_t* f=(void*)getmem(sizeof(future_t));
+	f->value=(void *)xmalloc(sizeof(int));
+	f->state=FUTURE_EMPTY;
+	f->pid=NULL//getpid() //NULL
+	f->mode=mode
+	f->set_queue->NULL
+	f->get_queue->NULL		
+	return f;
+}
+
+syscall future_free(future_t* f)
+{
+	intmask mask =disable();
+	if(f->set_queue!=NULL)
+		free(f->set_queue)
+	if(f->get_queue!=NULL)
+		free(f->get_queue);
+	free(f->value)
+	int val = freemem(f, sizeof(future_t))
+	restore(mask)
+	if(val!=SYSERR)
+		return OK;
+	else
+		return SYSERR
+}
+
+syscall future_get(future_t* f, int* value)
+{
+	intmask mask;
+	mask = disable();
+
+	restore(mask)
+	return OK;
+}
+
+syscall future_set(future_t* my_future, int my_value)
+{
+	return OK;
+}
