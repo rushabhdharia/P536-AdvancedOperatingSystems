@@ -9,9 +9,7 @@ uint future_prod(future_t* fut,int n) {
 
 uint future_cons(future_t* fut) {
   int i, status;
-  printf("here");
 	status = (int)future_get(fut, &i);
-  printf("%d",status);
 	if (status < 1) {
     printf("future_get failed\n");
     return -1;
