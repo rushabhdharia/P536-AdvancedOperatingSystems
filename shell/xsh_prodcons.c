@@ -19,7 +19,7 @@ shellcmd xsh_prodcons(int nargs, char *args[])
   f_shared    = future_alloc(FUTURE_SHARED);
   f_queue     = future_alloc(FUTURE_QUEUE);
 
-	int a=1; 
+	int a=3; 
   // Test FUTURE_EXCLUSIVE
 if(a==1){ 
  printf("Future Exclusive\n");

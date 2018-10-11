@@ -133,16 +133,16 @@ syscall future_get(future_t* f, int* value){
 			//signal(get);
 			suspend(pid);
 			*value = f->value;
-			f->state=FUTURE_EMPTY;
+			//f->state=FUTURE_EMPTY;
 			return OK;
 		}	
 		else
 		{
 			//wait(get);
+			restore(mask);
 			pid = dequeue_future(f->set_queue);
 			//signal(get);
 			resume(pid);
-			restore(mask);
 			*value = f->value;
 			f->state = FUTURE_EMPTY;
 			return OK;
@@ -198,12 +198,12 @@ syscall future_set(future_t* f, int value){
 		if(is_empty(f->get_queue))
 		{
 			//wait(set);
+			restore(mask);
 			enqueue_future(f->set_queue, pid);
 			//signal(set);
 			suspend(pid);
 			f->value = value;
 			f->state = FUTURE_READY;
-			restore(mask);
 			return OK;
 		}
 		else
@@ -211,10 +211,10 @@ syscall future_set(future_t* f, int value){
 			//wait(set);
 			f->value = value;
 			f->state = FUTURE_READY;
+			restore(mask);
 			pid = dequeue_future(f->get_queue);
 			//signal(set);
 			resume(pid);
-			restore(mask);
 			return OK;
 		}
 	}
