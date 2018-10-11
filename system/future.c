@@ -2,6 +2,8 @@
 #include <future.h>
 #include<stdio.h>
 
+//----------------------------------------------------------------------------------
+//Reference - https://www.geeksforgeeks.org/queue-set-2-linked-list-implementation/
 // Creates a new node in the queue and returns it
 struct node *newNode(pid32 pid){
 	struct node *temp = (struct node *)getmem(sizeof(struct node));
@@ -59,6 +61,7 @@ int is_empty(struct Queue *q){
 	}
 	return 0;
 }
+//--------------------------------------------------------------------------
 
 // Future System Call to allocate memory for the created future and set it's state, pid, mode, set_queue and get_queue.
 future_t* future_alloc(future_mode_t mode){
