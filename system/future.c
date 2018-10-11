@@ -101,6 +101,8 @@ syscall future_get(future_t* f, int* value){
 				return OK;
 			}
 			*value = f->value;
+			f->state = FUTURE_EMPTY;
+			future_free(f);
 			restore(mask);
 			return OK;
 	}
@@ -126,6 +128,8 @@ syscall future_get(future_t* f, int* value){
 		else if(f->state == FUTURE_READY)
 		{
 			*value = f->value;
+			f->state = FUTURE_EMPTY;
+			future_free(f);
 			restore(mask);
 		}
 	}
@@ -164,6 +168,7 @@ syscall future_get(future_t* f, int* value){
 			suspend(pid);
 			*value = f->value;
 			f->state=FUTURE_EMPTY;
+			future_free(f);
 			return OK;
 		}	
 		else

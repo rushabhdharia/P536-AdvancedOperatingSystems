@@ -1,0 +1,18 @@
+1. FUTURE_EXCLUSIVE Implementation
+i) In future_get(): The consumer thread waits till the state of the future is FUTURE_READY. Till that time the program keeps on suspending the consumer thread. When the state of the future is FUTURE_READY the thread accepts the value set.
+ii) In future_set(): If the state of the future is not FUTURE_READY, set the value of future to the value (integer) called and set the state of the future to FUTURE_READY.
+
+2. FUTURE_SHARED Implementation
+i)In future_get(): 
+If state of future is FUTURE_EMPTY or FUTURE_WAITING, enqueue the consumer to get_queue and suspend it till the value of future is set and state of the Future is FUTURE_READY.
+ii)In future_set():
+If state of future is FUTURE_EMPTY, set the value of the future and set the future's state to FUTURE_READY.
+If the state of the future is FUTURE_WAITING, set it's value, set the state to FUTURE_READY and dequeue all the nodes on the get_queue and resume the threads.
+
+3. FUTURE_QUEUE Implementation
+i)In future_get(): 
+If Set Queue is empty then enqueue consumer to get queue and suspend it till FUTURE_READY. Once FUTURE is READY take the value and set the state of future to FUTURE_EMPTY.
+If Set Queue is not empty dequeue the set queue and resume that process. Take the value of the future and set the state of Future to FUTURE_EMPTY
+ii)In future_set():
+If Get Queue is empty then enqueue producer to set queue and suspend the process. Set the value of future to the produced value and set it's state to FUTURE_READY.
+If Get Queue is not empty then set the value of future to the produced value, set the future's state to FUTURE_READY. Dequeue the get queue and resume the consumer which was dequeued.
