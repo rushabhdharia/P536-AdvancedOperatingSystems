@@ -41,7 +41,6 @@ pid32 dequeue_future(struct Queue *q){
 		return NULL;
 	}
 	pid32 p = q->front->pid;
-	//struct node *temp = q->front;
 	q->front = q->front->next;
 	if(q->front == NULL){
 		q->rear = NULL;
@@ -135,31 +134,7 @@ syscall future_get(future_t* f, int* value){
 	}
 	else if(f->mode == FUTURE_QUEUE)
 	{
-		pid32 pid =getpid();
-		//Try 1
-		/*	
-		if(f->state == FUTURE_EMPTY)
-		{
-			f->state = FUTURE_WAITING;
-			enqueue_future(f->get_queue, pid);
-			suspend(pid);
-			*value = f->value;
-		}
-		else if(f->state == FUTURE_WAITING)
-		{
-			enqueue_future(f->get_queue, pid);
-			suspend(pid);
-			*value= f->value;
-		}
-		else if(f->state == FUTURE_READY)
-		{
-			pid = dequeue_future(f->set_queue);
-			resume(pid);
-			*value = f->value;
-		}
-			
-		*/
-		//Try 2
+		pid32 pid =getpid();	
 		if(is_empty(f->set_queue))
 		{
 			enqueue_future(f->get_queue, pid);
@@ -232,28 +207,6 @@ syscall future_set(future_t* f, int value){
 	else if(f->mode == FUTURE_QUEUE)
 	{
 		pid = getpid();
-	/*	
-		if(f->state == FUTURE_EMPTY)
-		{
-			f->state = FUTURE_READY;
-			f->pid = pid;
-			f->value = value;
-			enqueue_future(f->set_queue, pid);
-			suspend(pid);
-		}	
-		else if(f->state == FUTURE_WAITING)
-		{
-			pid = dequeue_future(f->get_queue);
-			f->value = value;
-			resume(pid);
-		}
-		else if(f->state == FUTURE_READY)
-		{
-			f->pid = pid;
-			enqueue_future(f->set_queue, pid);
-			suspend(pid);
-			f->value = value;
-		}*/
 	if(is_empty(f->get_queue))
 		{
 			restore(mask);

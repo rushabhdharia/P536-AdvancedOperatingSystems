@@ -1,12 +1,14 @@
 #ifndef _FUTURE_H_
 #define _FUTURE_H_
 
+//Structure of Node in Queue
 struct node{
   pid32 pid;
   struct node *next;
   struct node *prev;
 };
 
+//Structure of Queue
 struct Queue{
 	struct node *front;
 	struct node *rear;
@@ -33,7 +35,8 @@ typedef struct {
   struct Queue *get_queue;
 } future_t;
 
-extern sid32 sem_future;
+//extern sid32 sem_future;
+//Semaphore for get and set queue
 extern sid32 set;
 extern sid32 get;
 
@@ -46,6 +49,7 @@ syscall future_set(future_t*, int);
 uint future_prod(future_t*, int);
 uint future_cons(future_t*);
 
+//Interface for Queue procedures
 struct node* newNode(pid32);
 struct Queue* createQueue();
 int is_empty(struct Queue*);

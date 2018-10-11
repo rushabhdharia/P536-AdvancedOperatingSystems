@@ -1,6 +1,7 @@
 #include<xinu.h>
 #include<prodcons.h>
 #include <future.h>
+
 uint future_prod(future_t* fut,int n) { 
   printf("Produced %d\n",n);
   future_set(fut,n);
