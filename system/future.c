@@ -3,6 +3,9 @@
 #include<stdio.h>
 //#include <mem.h>
 
+//set = semcreate(0);
+//get = semcreate(1);
+
 struct node *newNode(pid32 pid){
 	struct node *temp = (struct node *)getmem(sizeof(struct node));
 	temp->pid = pid;
@@ -125,6 +128,8 @@ syscall future_get(future_t* f, int* value){
 	else if(f->mode == FUTURE_QUEUE)
 	{
 		pid32 pid =getpid();
+		//Try 1
+		/*	
 		if(f->state == FUTURE_EMPTY)
 		{
 			f->state = FUTURE_WAITING;
@@ -145,29 +150,33 @@ syscall future_get(future_t* f, int* value){
 			*value = f->value;
 		}
 			
-		//if(is_empty(f->set_queue))
-		//{
-		//	//wait(get);
-		//	enqueue_future(f->get_queue, pid);
-		//	restore(mask);
-		//	f->state = FUTURE_WAITING;
-		//	//signal(get);
-		//	suspend(pid);
-		//	*value = f->value;
-		//	//f->state=FUTURE_EMPTY;
-		//	return OK;
-		//}	
-		//else
-		//{
-		//	//wait(get);
-		//	restore(mask);
-		//	pid = dequeue_future(f->set_queue);
-		//	//signal(get);
-		//	resume(pid);
-		//	*value = f->value;
-		//	f->state = FUTURE_EMPTY;
-		//	return OK;
-		//}
+		*/
+		//Try 2
+		if(is_empty(f->set_queue))
+		{
+			//wait(get);
+			enqueue_future(f->get_queue, pid);
+			restore(mask);
+			f->state = FUTURE_WAITING;
+			//signal(get);
+			suspend(pid);
+			*value = f->value;
+			f->state=FUTURE_EMPTY;
+			return OK;
+		}	
+		else
+		{
+			wait(set);
+			restore(mask);
+			pid = dequeue_future(f->set_queue);
+			signal(get);
+			resume(pid);
+			*value = f->value;
+			f->state = FUTURE_EMPTY;
+			
+			return OK;
+		}
+		
 	}
 	else{
 		restore(mask);
@@ -216,6 +225,7 @@ syscall future_set(future_t* f, int value){
 	else if(f->mode == FUTURE_QUEUE)
 	{
 		pid = getpid();
+	/*	
 		if(f->state == FUTURE_EMPTY)
 		{
 			f->state = FUTURE_READY;
@@ -236,29 +246,30 @@ syscall future_set(future_t* f, int value){
 			enqueue_future(f->set_queue, pid);
 			suspend(pid);
 			f->value = value;
+		}*/
+	if(is_empty(f->get_queue))
+		{
+			
+			//wait(get);
+			restore(mask);
+			enqueue_future(f->set_queue, pid);
+			//signal(set);
+			suspend(pid);
+			f->value = value;
+			f->state = FUTURE_READY;
+			return OK;
 		}
-	//if(is_empty(f->get_queue))
-		//{
-		//	//wait(set);
-		//	restore(mask);
-		//	enqueue_future(f->set_queue, pid);
-		//	//signal(set);
-		//	suspend(pid);
-		//	f->value = value;
-		//	f->state = FUTURE_READY;
-		//	return OK;
-		//}
-	//else
-	//	{
-	//		//wait(set);
-	//		f->value = value;
-	//		f->state = FUTURE_READY;
-	//		restore(mask);
-	//		pid = dequeue_future(f->get_queue);
-	//		//signal(set);
-	//		resume(pid);
-	//		return OK;
-	//	}
+	else
+		{
+			wait(get);
+			f->value = value;
+			f->state = FUTURE_READY;
+			restore(mask);
+			pid = dequeue_future(f->get_queue);
+			signal(set);
+			resume(pid);
+			return OK;
+		}
 	}
 	else
 	{

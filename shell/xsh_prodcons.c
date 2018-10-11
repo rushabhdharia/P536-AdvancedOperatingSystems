@@ -19,6 +19,9 @@ shellcmd xsh_prodcons(int nargs, char *args[])
   f_shared    = future_alloc(FUTURE_SHARED);
   f_queue     = future_alloc(FUTURE_QUEUE);
  
+	set = semcreate(0);
+	get = semcreate(1);	
+
   // Test FUTURE_EXCLUSIVE 
  //printf("Future Exclusive\n");
   resume( create(future_cons, 1024, 20, "fcons1", 1, f_exclusive) );
