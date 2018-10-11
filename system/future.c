@@ -1,11 +1,8 @@
 #include <xinu.h>
 #include <future.h>
 #include<stdio.h>
-//#include <mem.h>
 
-//set = semcreate(0);
-//get = semcreate(1);
-
+// Creates a new node in the queue and returns it
 struct node *newNode(pid32 pid){
 	struct node *temp = (struct node *)getmem(sizeof(struct node));
 	temp->pid = pid;
@@ -14,6 +11,7 @@ struct node *newNode(pid32 pid){
 	return temp;
 }
 
+// Creates a new queue and returns it.
 struct Queue *createQueue(){
 	struct Queue *q = (struct Queue *)getmem(sizeof(struct Queue));
 	q->front=NULL;
@@ -21,6 +19,7 @@ struct Queue *createQueue(){
 	return q;
 }
 
+// Adds a node to the queue
 void enqueue_future(struct Queue *q, pid32 p){
 	struct node *temp = newNode(p);
 	if(q->rear==NULL)
@@ -35,6 +34,7 @@ void enqueue_future(struct Queue *q, pid32 p){
 	suspend(p);
 }
 
+//removes the first node from the queue and returns it's pid
 pid32 dequeue_future(struct Queue *q){
 	if(q->front == NULL)
 	{
@@ -52,6 +52,7 @@ pid32 dequeue_future(struct Queue *q){
 	return p;
 }
 
+//checks if the Queue is empty
 int is_empty(struct Queue *q){
 	if(q->front !=NULL)
 	{
@@ -60,6 +61,7 @@ int is_empty(struct Queue *q){
 	return 0;
 }
 
+// Future System Call to allocate memory for the created future and set it's state, pid, mode, set_queue and get_queue.
 future_t* future_alloc(future_mode_t mode){
 	intmask mask = disable();
 	future_t* f=(void*)getmem(sizeof(future_t));
@@ -73,6 +75,7 @@ future_t* future_alloc(future_mode_t mode){
 	return f;
 }
 
+//System Call to Free the memory which was used to allocate the future
 syscall future_free(future_t* f){
 	intmask mask =disable();
 	int val = freemem((char *)f,sizeof(future_t));
@@ -83,6 +86,7 @@ syscall future_free(future_t* f){
 		return SYSERR;
 }
 
+// System Call to get the Future Value set by the Producer Thread
 syscall future_get(future_t* f, int* value){
 	intmask mask;
 	mask = disable();
@@ -154,11 +158,9 @@ syscall future_get(future_t* f, int* value){
 		//Try 2
 		if(is_empty(f->set_queue))
 		{
-			//wait(get);
 			enqueue_future(f->get_queue, pid);
 			restore(mask);
 			f->state = FUTURE_WAITING;
-			//signal(get);
 			suspend(pid);
 			*value = f->value;
 			f->state=FUTURE_EMPTY;
@@ -172,8 +174,7 @@ syscall future_get(future_t* f, int* value){
 			signal(get);
 			resume(pid);
 			*value = f->value;
-			f->state = FUTURE_EMPTY;
-			
+			f->state = FUTURE_EMPTY;	
 			return OK;
 		}
 		
@@ -186,6 +187,7 @@ syscall future_get(future_t* f, int* value){
 	return OK;
 }
 
+//System Call to Set the value produced by the Producer thread so that it can be used by the consumer thread.
 syscall future_set(future_t* f, int value){
 	intmask mask;
 	pid32 pid;
@@ -249,11 +251,8 @@ syscall future_set(future_t* f, int value){
 		}*/
 	if(is_empty(f->get_queue))
 		{
-			
-			//wait(get);
 			restore(mask);
 			enqueue_future(f->set_queue, pid);
-			//signal(set);
 			suspend(pid);
 			f->value = value;
 			f->state = FUTURE_READY;
