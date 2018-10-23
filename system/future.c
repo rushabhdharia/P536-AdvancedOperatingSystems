@@ -93,7 +93,7 @@ syscall future_get(future_t* f, int* value){
 	intmask mask;
 	mask = disable();
 	if(f->mode == FUTURE_EXCLUSIVE){
-			while(f->state != FUTURE_READY)
+			if(f->state != FUTURE_READY)
 			{
 				f->pid = getpid();
 				f->state = FUTURE_WAITING;
