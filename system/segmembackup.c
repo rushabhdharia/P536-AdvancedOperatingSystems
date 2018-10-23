@@ -1,8 +1,8 @@
-
+/*
 #include <stdio.h>
 #include<xinu.h>
 #include<segmem.h>
-
+*/
 /* 
 1 - 32 x 32
 2 - 64 x 16
@@ -13,7 +13,7 @@
 Max heap size - 512*5 bytes
 */
 //Reference https://stackoverflow.com/questions/25735905/implementing-segregated-memory-storage-malloc-in-c
-
+/*
 void *base_ptr = getmem((int)MAX_HEAP_SIZE);
 
 struct pool_info
@@ -102,4 +102,4 @@ void xheap_snapshot()
 
 
 }
-
+*/
