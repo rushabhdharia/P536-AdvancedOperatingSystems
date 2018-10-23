@@ -11,7 +11,7 @@ typedef struct {
 
 
 void xmalloc_init();
-//struct pool_info* xmalloc(ssize_t);
+void* xmalloc(int);
 void xfree(void*);
 void xheap_snapshot();
 
