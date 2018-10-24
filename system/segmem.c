@@ -5,7 +5,7 @@ bpid32 bp_a[6];
 int alloc_buff[6];
 int alloc_bytes[6];
 int pointer_id[65];
-int size = [65];
+int size_buf [65];
 int associated_pool[65];
 int count = 0;
 
@@ -58,19 +58,34 @@ void* xmalloc(int size)
 	if(i == -1) 
 	{
 		printf("Cannot allocate memory more than 1024 bytes.");
+		return SYSERR;
 	}
 	else
 	{
 		ptr = getbuf(i);
 		alloc_buff[i]+=1;
 		alloc_bytes[i]+=size;	
+		pointer_id[count]=(int)ptr;
+		size_buf[count] = size;
+		associated_pool[count]= i; 
 	}
 	return (void*) ptr;
 }
 
 void xfree(void* ptr)
 {
+	int i,j;
 	char *p = (char*)ptr;
+	int condition = (int) ptr;
+	for(i=0;i<65;i++)
+	{
+		if(pointer_id[i]==condition)
+			break;
+	}
+	j = associated_pool[i];
+	alloc_buff[j] -= 1;
+	alloc_bytes[j] -= size_buf[i];	
+	
 	if(freebuf(p)==SYSERR)
 		printf("not done\n");
 	else
