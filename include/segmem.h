@@ -13,10 +13,11 @@ struct node
 void xmalloc_init();
 void* xmalloc(int);
 void xfree(void*);
-void xheap_snapshot();
+char* xheap_snapshot();
 
 struct node *createll();
 struct node *addNode(struct node*, int pointer, int size);
 struct node *remove(struct node*, int pointer);
+void printll(struct node*);
 
 #endif

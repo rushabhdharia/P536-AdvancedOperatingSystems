@@ -4,6 +4,10 @@
 bpid32 bp_a[6];
 int alloc_buff[6];
 int alloc_bytes[6];
+int pointer_id[65];
+int size = [65];
+int associated_pool[65];
+int count = 0;
 
 struct node *head0 = NULL;
 struct node *head1 = NULL;
@@ -11,7 +15,7 @@ struct node *head2 = NULL;
 struct node *head3 = NULL;
 struct node *head4 = NULL;
 struct node *head5 = NULL;
-
+/*
 //-----------------------------------------------------------------------
 // Code Adapted from -  Data Structures using C - Reema Thareja page 175
 struct node *createll()
@@ -36,7 +40,7 @@ struct node *addNode(struct node* start, int pointer, int size)
 	temp->next = newnode;
 	newnode->next = NULL;
 	//printf("\nAdded\n");
-	printf("\nAdded pointer2 = %d\n", pointer);
+	printf("Added pointer2 = %d\n", pointer);
 	return start;
 }
 
@@ -44,7 +48,8 @@ struct node *remove(struct node* start, int pointer)
 {
 	struct node *preptr, *ptr;
 	ptr = start;
-	printf("Removing pointer = %d", pointer);
+	printf("Removing pointer = %d\n", pointer);
+
 	if(ptr->pointer == pointer)
 	{
 		start=start->next;
@@ -64,8 +69,21 @@ struct node *remove(struct node* start, int pointer)
 
 }
 
-//----------------------------------------------------------------------------
+void printll(struct node* start)
+{
+	struct node *ptr;
+	ptr = start;
+	printf("\n----------------------\n");
+	while(ptr != NULL)
+	{
+		printf("/t%d", ptr->size);
+		ptr = ptr->next;
+	}
+	printf("\n-------------------\n");
+}
 
+//----------------------------------------------------------------------------
+*/
 void xmalloc_init()
 {
 	int i,buff_size =32, num_of_buf = 32;
@@ -86,7 +104,12 @@ void xmalloc_init()
 		buff_size*=2;
 		num_of_buf /= 2;
 	}
-	head0 = createll();
+	//head0 = createll();
+	//head1 = createll();
+	//head2 = createll();
+	//head3 = createll();
+	//head4 = createll();
+	//head5 = createll();
 }
 
 int decide(int size)
@@ -108,13 +131,14 @@ int decide(int size)
 		i=-1;
 	return i;
 }
-
-void removeFromList(char *ptr)
+/*
+void removeFromList(int ptr)
 {
 	//int i=-1;
-	printf("Removing pointer %d \n", &ptr);
+	printf("Removing pointer 3 = %d \n", &ptr);
 	int pr =(int) &ptr;
-	printf("pr = %d\n", pr);
+	//printf("Removing pointer 4 = %d\n", &pr);
+	//printf("pr = %d\n", pr);
 	struct node *find;
 	find = head0;
 	do
@@ -131,11 +155,11 @@ void removeFromList(char *ptr)
 	}while(find->next!=NULL);
 	
 }
-
+*/
 void* xmalloc(int size)
 {
 	char *ptr;
-	int pr;
+	//int pr;
 	int i = decide(size);
 	if(i == -1) 
 	{
@@ -144,22 +168,44 @@ void* xmalloc(int size)
 	else
 	{
 		ptr = getbuf(i);
-		pr = (int)&ptr;	
-		printf("Adding Pointer %d\n", &ptr);
+		//pr = (int)ptr;	
+		//printf("Adding Pointer %d\n", &ptr);
 		//printf("Adding pr = %d\n",&pr);
 		alloc_buff[i]+=1;
 		alloc_bytes[i]+=size;
-		if(i==0)
-			addNode(head0,pr,size);	
+		
+		//if(i==0)
+		//	head0 = addNode(head0,pr,size);	
+		//printll(head0);	
 	}
 	return (void*) ptr;
 }
 
 void xfree(void* ptr)
 {
-	ptr = (char*) ptr;
-	removeFromList(ptr);
-	if(freebuf(ptr)==SYSERR)
+	//int ptr1=(int)ptr;
+	//printf("Removing Pointer1 = %d\n",&ptr);
+	//removeFromList(ptr1);
+	//printf("Removing Pointer2.5 = %d\n", (int)&ptr);
+	/*
+	struct node *find;
+	find = head0;
+	do
+	{
+		if(find->pointer == (int)ptr)
+		{
+			printf("\nhere-------------\n");
+			alloc_bytes[0]-=head0->size;
+			remove(head0,(int) ptr);
+			alloc_buff[0]-=1;
+			break;
+		}
+		find = find->next;
+	}while(find->next!=NULL);
+	*/
+	//removeFromList(&ptr);
+	char *p = (char*)ptr;
+	if(freebuf(p)==SYSERR)
 		printf("not done\n");
 	else
 		printf("success\n");
@@ -169,6 +215,7 @@ void xfree(void* ptr)
 void xheap_snapshot()
 {
 	int i;
+	//char* toprint;
 	int buff_size=32, total_buff = 32, frag_bytes = 0;
 	for(i=0;i<5;i++)
 	{
@@ -177,4 +224,5 @@ void xheap_snapshot()
 		buff_size*=2;		
 		total_buff/=2;
 	}
+	//return toprint;
 }
