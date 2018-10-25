@@ -58,7 +58,7 @@ void* xmalloc(int size)
 	else
 	{
 		ptr = getbuf((bpid32)i);
-		printf("%d\n",(int)ptr);
+		//printf("%d\n",(int)ptr);
 		alloc_buff[i]+=1;
 		alloc_bytes[i]+=size;	
 		pointer_id[count]=(int)ptr;
@@ -74,27 +74,27 @@ void xfree(void* ptr)
 	int i,j;
 	char *p = (char*)ptr;
 	int condition = (int) ptr;
-	for(i=0;i<2;i++)
-	{
-		printf("%d\t", pointer_id[i]);
-	}
-	printf("\ncondition = %d", condition);
+	//for(i=0;i<2;i++)
+	//{
+	//	printf("%d\t", pointer_id[i]);
+	//}
+	//printf("\ncondition = %d", condition);
 	for(i=0;i<65;i++)
 	{
 		if(pointer_id[i]==condition)
 		{	
-			printf("\nHere\n");
+			//printf("\nHere\n");
 			j = associated_pool[i];
 			alloc_buff[j] -= 1;
 			alloc_bytes[j] -= size_buf[i];
 			break;
 		}
 	}
-	
-	if(freebuf(p)==SYSERR)
-		printf("not done\n");
-	else
-		printf("success\n");
+	freebuf(p);
+	//if(freebuf(p)==SYSERR)
+	//	printf("Cannot free\n");
+	//else
+	//	printf("Freed\n");
 }
 
 void xheap_snapshot()

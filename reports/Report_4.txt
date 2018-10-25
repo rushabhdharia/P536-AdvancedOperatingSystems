@@ -1,0 +1,24 @@
+To Run
+1. In Terminal type make then make qemu. Xinu will boot;
+2. In Xinu's shell call command xmalloc to run the xmalloc_test.c file.
+
+Design:
+Most of Xinu's objects have size 32 bits eg. int32, pid32. Therefore, the minimum buffer size I've selected is 32bits. I go upto 512 since xinu mostly runs embedded systems which have low  memory.
+
+I used xinu's inbuilt functions bufinit() (To initialize the buffer), mkbufpool (to make the respective buffer pools), getbuf() (to get a free buffer from the requested pool) and freebuf() (to free the respective buffer)
+
+function xmalloc_init() is used to initialize the bufferpools;
+
+function xmalloc() is used to allocate a buffer from the pools and return pointer to that memory location.
+
+function xfree() frees the repective buffer of the pointer called.
+
+function xheap_snapshot() is used to print the current status of the buffer pools.
+
+array alloc_buff[] is used to store the number of buffers allocated in each pool.
+array alloc_bytes[] is used to store the number of allocated bytes in each pool
+array pointer_id[] is used to store the pointer of each allocated buffer
+array size_buf[] is used to store the size used by the caller
+array associated_pool[] is used to store the pool associated to the pointer given to the caller of xmalloc.
+
+ 
