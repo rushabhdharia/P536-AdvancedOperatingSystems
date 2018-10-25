@@ -3,7 +3,7 @@ To Run
 2. In Xinu's shell call command xmalloc to run the xmalloc_test.c file.
 
 Design:
-Most of Xinu's objects have size 32 bits eg. int32, pid32. Therefore, the minimum buffer size I've selected is 32bits. I go upto 512 since xinu mostly runs embedded systems which have low  memory.
+Most of Xinu's objects have size 32 bits eg. int32, pid32. Therefore, the minimum buffer size I've selected is 32bits. I go upto 1024 since xinu mostly runs embedded systems which have low  memory.
 
 I used xinu's inbuilt functions bufinit() (To initialize the buffer), mkbufpool (to make the respective buffer pools), getbuf() (to get a free buffer from the requested pool) and freebuf() (to free the respective buffer)
 

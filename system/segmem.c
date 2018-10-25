@@ -102,7 +102,7 @@ void xheap_snapshot()
 	int i;
 	//char* toprint;
 	int buff_size=32, total_buff = 32, frag_bytes = 0;
-	for(i=0;i<5;i++)
+	for(i=0;i<=5;i++)
 	{
 		frag_bytes = alloc_buff[i]*buff_size-alloc_bytes[i];
 		printf("pool_id=%d, buffer_size=%d, total_buffers=%d, allocated_bytes=%d, allocated_buffers=%d, fragmented_bytes=%d\n", i, buff_size, total_buff, alloc_bytes[i], alloc_buff[i], frag_bytes);
