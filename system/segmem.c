@@ -31,8 +31,9 @@ void xmalloc_init()
 	}
 }
 
-int decide(int size)
+void* xmalloc(int size)
 {
+	char *ptr;
 	int i;
 	if(size<=32)
 		i=0;	
@@ -48,26 +49,22 @@ int decide(int size)
 		i=5;
 	else
 		i=-1;
-	return i;
-}
 
-void* xmalloc(int size)
-{
-	char *ptr;
-	int i = decide(size);
 	if(i == -1) 
 	{
 		printf("Cannot allocate memory more than 1024 bytes.");
-		return SYSERR;
+		return (void*)-1;
 	}
 	else
 	{
-		ptr = getbuf(i);
+		ptr = getbuf((bpid32)i);
+		printf("%d\n",(int)ptr);
 		alloc_buff[i]+=1;
 		alloc_bytes[i]+=size;	
 		pointer_id[count]=(int)ptr;
 		size_buf[count] = size;
-		associated_pool[count]= i; 
+		associated_pool[count]= i;
+		count+=1; 
 	}
 	return (void*) ptr;
 }
@@ -77,14 +74,22 @@ void xfree(void* ptr)
 	int i,j;
 	char *p = (char*)ptr;
 	int condition = (int) ptr;
+	for(i=0;i<2;i++)
+	{
+		printf("%d\t", pointer_id[i]);
+	}
+	printf("\ncondition = %d", condition);
 	for(i=0;i<65;i++)
 	{
 		if(pointer_id[i]==condition)
+		{	
+			printf("\nHere\n");
+			j = associated_pool[i];
+			alloc_buff[j] -= 1;
+			alloc_bytes[j] -= size_buf[i];
 			break;
+		}
 	}
-	j = associated_pool[i];
-	alloc_buff[j] -= 1;
-	alloc_bytes[j] -= size_buf[i];	
 	
 	if(freebuf(p)==SYSERR)
 		printf("not done\n");
