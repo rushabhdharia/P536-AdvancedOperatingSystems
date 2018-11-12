@@ -1,33 +1,37 @@
 #include<xinu.h>
 #include<segmem.h>
 
-bpid32 bp_a[6];
-int alloc_buff[6];
-int alloc_bytes[6];
-int pointer_id[65];
-int size_buf [65];
-int associated_pool[65];
+bpid32 bp_a[10];
+int alloc_buff[10];
+int alloc_bytes[10];
+int pointer_id[1000];
+int size_buf [1000];
+int associated_pool[1000];
 int count = 0;
 
 void xmalloc_init()
 {
-	int i,buff_size =32, num_of_buf = 32;
+	int i,buff_size = 2, num_of_buf = 100;
 	/*
  	buffer id | buffer_size | Number of buffers in pool
- 	0 - 32 x 32
-	1 - 64 x 16
-	2 - 128 x 8
-	3 - 256 x 4
-	4 - 512 x 2
-	5 - 1024 x 1
+	0 - 2 x 100
+	1 - 4 x 100
+	2 - 8 x 100
+	3 - 16 x 100
+ 	4 - 32 x 100
+	5 - 64 x 100
+	6 - 128 x 100
+	7 - 256 x 100
+	8 - 512 x 100
+	9 - 1024 x 100
 	*/
 	bufinit();
-	for(i = 0; i<=5; i++)
+	for(i = 0; i<=9; i++)
 	{
 		bp_a[i] = mkbufpool(buff_size,num_of_buf);
 		alloc_buff[i] = 0;
 		buff_size*=2;
-		num_of_buf /= 2;
+		//num_of_buf /= 2;
 	}
 }
 
@@ -35,18 +39,26 @@ void* xmalloc(int size)
 {
 	char *ptr;
 	int i;
-	if(size<=32)
-		i=0;	
-	else if(size<=64)
+	if (size<=2)
+		i=0;
+	else if(size<=4)
 		i=1;
-	else if(size<=128)
+	else if (size <= 8)
 		i=2;
-	else if(size<=256)
+	else if (size <= 16)
 		i=3;
-	else if(size <= 512)
-		i=4;
-	else if(size <=1024)
+	else if(size<=32)
+		i=4;	
+	else if(size<=64)
 		i=5;
+	else if(size<=128)
+		i=6;
+	else if(size<=256)
+		i=7;
+	else if(size <= 512)
+		i=8;
+	else if(size <=1024)
+		i=9;
 	else
 		i=-1;
 
@@ -79,7 +91,7 @@ void xfree(void* ptr)
 	//	printf("%d\t", pointer_id[i]);
 	//}
 	//printf("\ncondition = %d", condition);
-	for(i=0;i<65;i++)
+	for(i=0;i<1000;i++)
 	{
 		if(pointer_id[i]==condition)
 		{	

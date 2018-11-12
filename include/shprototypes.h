@@ -88,6 +88,9 @@ extern shellcmd xmalloc_test	(int32, char *[]);
 /* in file xsh_mmu.c */
 extern  shellcmd xsh_mmu	(int32, char *[]);
 
+/* in file kv_test.c */
+extern shellcmd kv_test	(int32, char *[]);
+
 extern shellcmd xsh_create_example(int, char *[]);
 extern shellcmd xsh_polling_example(int, char *[]);
 extern shellcmd xsh_semaphore_example(int, char *[]);
