@@ -19,40 +19,46 @@ int counter = 0;
 int kv_init()
 {
  	xmalloc_init();	
-	return 1;
+	return 0;
 }
 
 
 char* kv_get(char* key)
 {	
 	char* value;
-	int count1 = 0;
-	printf("Here 1\n");
-	printf("key = %s\n", key);
 	struct node* current = head;
+	struct node* prev = current;
+	
+	//printf("Here 1\n");
+	//printf("key = %s\n", key);
 	if(head == NULL)
 	{
-		printf("returning here");
+		//printf("returning here");
 		return NULL;
 	}	
 	
 	while(current->key!=key)
 	{	
-		count1++;
 		if (current->next==NULL)
 		{
 			return NULL;
 		}
 		else
 		{
+			prev = current;
 			current = current->next;
 		}
-		printf("Here 2\n");
-		printf("%s\n", current->key);
-		printf("%s\n", key);
+		//printf("Here 2\n");
+		//printf("%s\n", current->key);
+		//printf("%s\n", key);
 	}
 	value = current->value;
 	printf("%s", value);
+	prev->next = current->next;
+	while(prev->next!=NULL)
+		prev = prev->next;
+	prev->next = current;	
+	current->next = NULL;
 	return value;
 }
 
@@ -60,7 +66,9 @@ int kv_set(char* key, char* value)
 {
 	struct node *temp = (struct node*)xmalloc(sizeof(struct node));
 	struct node *ptr;
-	counter++;
+
+	if(counter<100)
+		counter++;
 	printf("%d\n", counter);
 	printf("%s\n", key);
 	printf("%s\n", value);
@@ -71,6 +79,11 @@ int kv_set(char* key, char* value)
 	printf("%s\n", temp->key);
 	printf("%s\n", temp->value);
 
+	if(counter == 100)
+	{
+		if(!kv_delete(head->key))
+			return 1;
+	}
 	if(head == NULL)
 	{
 		head = temp;
@@ -84,7 +97,7 @@ int kv_set(char* key, char* value)
 		}
 		ptr->next = temp;
 	}
-	printf("\nI am here\n");
+	//printf("\nI am here\n");
 	return 0;  
 }
 
@@ -118,6 +131,7 @@ bool kv_delete(char* key)
 	{
 		prev->next = current->next;
 	}
+	xfree(current);
 	return true;
 }
 

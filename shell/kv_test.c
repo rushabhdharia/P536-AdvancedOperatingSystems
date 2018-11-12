@@ -12,7 +12,7 @@ shellcmd kv_test(int nargs, char *args[])
 
     retval=kv_set("ctttjyhm", "rmxrodelucysiaytouifbtryfcdveypsjw"); 
      if(retval>0) set_errors++; 
-/* 
+ 
     retval=kv_set("odzuzdge", "txegveaskmlwxkpnrzmurhsbyrrxqudjgrpxom"); 
      if(retval>0) set_errors++; 
  
@@ -394,10 +394,10 @@ shellcmd kv_test(int nargs, char *args[])
     retval=kv_set("isrtiuvv", "zmrrsqqsmmvikwnwypctxdpkqmitdxzwpu"); 
      if(retval>0) set_errors++; 
  
-*/
+
     valtmp = kv_get("ctttjyhm"); 
      if(valtmp==NULL) get_errors++; 
-/*
+
     valtmp = kv_get("odzuzdge"); 
      if(valtmp==NULL) get_errors++; 
 
@@ -694,7 +694,7 @@ shellcmd kv_test(int nargs, char *args[])
 
     valtmp = kv_get("mvgjjgrv"); 
      if(valtmp==NULL) get_errors++; 
-*/
+
     printf("%d, %d \n",set_errors, get_errors); 
  kv_reset(); 
  }
