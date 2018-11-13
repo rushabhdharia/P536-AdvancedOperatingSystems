@@ -6,7 +6,8 @@ shellcmd kv_test(int nargs, char *args[])
      int retval; 
      int set_errors = 0; 
      char* valtmp=NULL; 
-     int get_errors=0; 
+     int get_errors=0;
+	int value; 
     kv_init(); 
 
 
@@ -696,5 +697,43 @@ shellcmd kv_test(int nargs, char *args[])
      if(valtmp==NULL) get_errors++; 
 
     printf("%d, %d \n",set_errors, get_errors); 
+
+printf("--------------------------------\n");
+value = get_cache_info("total_hits");
+printf("%d\n", value);
+
+value = get_cache_info("total_accesses");
+printf("%d\n", value);
+
+value = get_cache_info("total_set_success");
+printf("%d\n", value);
+
+value = get_cache_info("cache_size");
+printf("%d\n", value);
+
+value = get_cache_info("num_keys");
+printf("%d\n", value);
+
+value = get_cache_info("total_evictions");
+printf("%d\n", value);
  kv_reset(); 
+printf("--------------------------------\n");
+
+value = get_cache_info("total_hits");
+printf("%d\n", value);
+
+value = get_cache_info("total_accesses");
+printf("%d\n", value);
+
+value = get_cache_info("total_set_success");
+printf("%d\n", value);
+
+value = get_cache_info("cache_size");
+printf("%d\n", value);
+
+value = get_cache_info("num_keys");
+printf("%d\n", value);
+
+value = get_cache_info("total_evictions");
+printf("%d\n", value);
  }

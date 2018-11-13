@@ -14,7 +14,13 @@ struct node
 };
 
 struct node *head = NULL;
-int counter = 0;
+//int counter = 0;
+int total_hits = 0;
+int total_acc = 0;
+int total_set_succ = 0;
+int cache_size = 0;
+int num_keys = 0;
+int total_evict = 0;
 
 int kv_init()
 {
@@ -28,7 +34,7 @@ char* kv_get(char* key)
 	char* value;
 	struct node* current = head;
 	struct node* prev = current;
-	
+	total_acc+=1;
 	//printf("Here 1\n");
 	//printf("key = %s\n", key);
 	if(head == NULL)
@@ -52,6 +58,7 @@ char* kv_get(char* key)
 		//printf("%s\n", current->key);
 		//printf("%s\n", key);
 	}
+	total_hits+=1;
 	value = current->value;
 	printf("%s", value);
 	prev->next = current->next;
@@ -67,9 +74,9 @@ int kv_set(char* key, char* value)
 	struct node *temp = (struct node*)xmalloc(sizeof(struct node));
 	struct node *ptr;
 
-	if(counter<100)
-		counter++;
-	printf("%d\n", counter);
+	if(num_keys<100)
+		num_keys+=1;
+	//printf("%d\n", num_keys);
 	printf("%s\n", key);
 	printf("%s\n", value);
 	temp->key = key;
@@ -79,10 +86,11 @@ int kv_set(char* key, char* value)
 	printf("%s\n", temp->key);
 	printf("%s\n", temp->value);
 
-	if(counter == 100)
+	if(num_keys == 100)
 	{
 		if(!kv_delete(head->key))
 			return 1;
+		total_evict+=1;
 	}
 	if(head == NULL)
 	{
@@ -98,6 +106,7 @@ int kv_set(char* key, char* value)
 		ptr->next = temp;
 	}
 	//printf("\nI am here\n");
+	total_set_succ+=1;
 	return 0;  
 }
 
@@ -145,4 +154,35 @@ void kv_reset()
 		current = current->next;
 		xfree(prev);
 	}
+	total_hits = 0;
+	total_acc = 0;
+	total_set_succ = 0;
+	cache_size = 0;
+	num_keys = 0;
+	total_evict = 0;
+}
+
+int get_cache_info(char *kind)
+{
+	int len = strlen(kind);
+	if(strncmp(kind, "total_hits", len)==0)
+	{
+		//printf("hit = %d", total_hits);
+		return total_hits;
+	}
+	else if(strncmp(kind, "total_accesses", len)==0)
+		return total_acc;
+	else if(strncmp(kind, "total_set_success", len)==0)
+		return total_set_succ;
+	else if(strncmp(kind, "cache_size", len)==0)
+	{
+		cache_size = num_keys * sizeof(struct node);
+		return  cache_size;
+	}
+	else if(strncmp(kind, "num_keys", len)==0)
+		return num_keys;
+
+	else if (strncmp(kind, "total_evictions", len)==0)
+		return total_evict;	
+	return 1;
 }
