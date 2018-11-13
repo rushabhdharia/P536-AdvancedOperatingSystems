@@ -1,0 +1,21 @@
+To Run
+1. In Terminal type make then make qemu. Xinu will boot;
+2. In Xinu's shell call command kv to run the kv_test.c file.
+
+Note: 
+1. Cache size is set to 100.
+2. Cache Eviction policy used - LRU
+
+kv_init() function is used to call xmalloc_init
+
+kv_get() function is used to find a particular key and return it's value. If the key is not present in the cache then it returns NULL (cache miss), else it returns the value associated with that key(cache hit). When a cache hit occurs it moves the key-value pair to the end of the initialized linked list (to the MRU position). 
+
+kv_set() function is used to add a key-value pair to the cache. It throws an error when the user tries to allocate large keys (greater than 64 bytes) and values(greater than 1KB). If the cache is full then the Least Recently used element is removed from the cache.
+
+kv_delete() function is used to delete a particular key from the cache.
+
+kv_reset() function is used to delete all the key-value pairs from the cache and initialize all the cache_info variables to 0.
+
+get_cache_info() function is used to output the cache performance by returning value to the parameters like total number of hits, total number of accesses, total number of keys in cache, total number of items evicted and the total cache size.
+
+most_popular_keys() function is used to return an array of char pointers which contains the k most popular keys. 
