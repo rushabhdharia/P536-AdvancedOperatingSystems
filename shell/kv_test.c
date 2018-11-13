@@ -7,7 +7,8 @@ shellcmd kv_test(int nargs, char *args[])
      int set_errors = 0; 
      char* valtmp=NULL; 
      int get_errors=0;
-	int value; 
+	int value, i;
+	char** pop_keys; 
     kv_init(); 
 
 
@@ -716,6 +717,12 @@ printf("%d\n", value);
 
 value = get_cache_info("total_evictions");
 printf("%d\n", value);
+
+pop_keys = most_popular_keys(10);
+
+for(i=0;i<10;i++)
+	printf("%s\n", pop_keys[i]);
+
  kv_reset(); 
 printf("--------------------------------\n");
 

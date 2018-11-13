@@ -193,17 +193,23 @@ char** most_popular_keys(int k)
 	char** popular_keys = (char **)xmalloc(k*sizeof(char*));
 	int i;
 	struct node *ptr;
+	//char *pointer;
 	ptr = head;
-	for(i=0; i<num_keys-k;i++)
+	
+	for(i=1; i<num_keys-k-1;i++)
 	{
 		ptr = ptr->next;
 	}
-	for(i=k;i<0;i++)
+	while(k>=0)
 	{
-		popular_keys[i] = ptr->key;
+		k--;
+		//pointer=ptr->key;
+		popular_keys[k] = ptr->key;
+		printf("%s\n", ptr->key);
 		ptr = ptr->next; 
 		if(ptr->next == NULL)
 			break;
+	
 
 	}
 	return popular_keys;
