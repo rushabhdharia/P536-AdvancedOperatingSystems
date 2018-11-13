@@ -73,7 +73,8 @@ int kv_set(char* key, char* value)
 {
 	struct node *temp = (struct node*)xmalloc(sizeof(struct node));
 	struct node *ptr;
-
+	if(strlen(key)>64 || strlen(value)>1024)
+		return SYSERR;
 	if(num_keys<100)
 		num_keys+=1;
 	//printf("%d\n", num_keys);
@@ -185,4 +186,25 @@ int get_cache_info(char *kind)
 	else if (strncmp(kind, "total_evictions", len)==0)
 		return total_evict;	
 	return 1;
+}
+
+char** most_popular_keys(int k)
+{
+	char** popular_keys = (char **)xmalloc(k*sizeof(char*));
+	int i;
+	struct node *ptr;
+	ptr = head;
+	for(i=0; i<num_keys-k;i++)
+	{
+		ptr = ptr->next;
+	}
+	for(i=k;i<0;i++)
+	{
+		popular_keys[i] = ptr->key;
+		ptr = ptr->next; 
+		if(ptr->next == NULL)
+			break;
+
+	}
+	return popular_keys;
 }
