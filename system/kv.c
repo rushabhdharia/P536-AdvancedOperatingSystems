@@ -35,11 +35,9 @@ char* kv_get(char* key)
 	struct node* current = head;
 	struct node* prev = current;
 	total_acc+=1;
-	//printf("Here 1\n");
-	//printf("key = %s\n", key);
+
 	if(head == NULL)
 	{
-		//printf("returning here");
 		return NULL;
 	}	
 	
@@ -54,13 +52,9 @@ char* kv_get(char* key)
 			prev = current;
 			current = current->next;
 		}
-		//printf("Here 2\n");
-		//printf("%s\n", current->key);
-		//printf("%s\n", key);
 	}
 	total_hits+=1;
 	value = current->value;
-	printf("%s", value);
 	prev->next = current->next;
 	while(prev->next!=NULL)
 		prev = prev->next;
@@ -77,15 +71,10 @@ int kv_set(char* key, char* value)
 		return SYSERR;
 	if(num_keys<100)
 		num_keys+=1;
-	//printf("%d\n", num_keys);
-	printf("%s\n", key);
-	printf("%s\n", value);
+	
 	temp->key = key;
 	temp->value = value;
 	temp->next = NULL;
-	//printf("%d\n", counter);
-	printf("%s\n", temp->key);
-	printf("%s\n", temp->value);
 
 	if(num_keys == 100)
 	{
@@ -106,7 +95,7 @@ int kv_set(char* key, char* value)
 		}
 		ptr->next = temp;
 	}
-	//printf("\nI am here\n");
+	
 	total_set_succ+=1;
 	return 0;  
 }
@@ -167,10 +156,7 @@ int get_cache_info(char *kind)
 {
 	int len = strlen(kind);
 	if(strncmp(kind, "total_hits", len)==0)
-	{
-		//printf("hit = %d", total_hits);
 		return total_hits;
-	}
 	else if(strncmp(kind, "total_accesses", len)==0)
 		return total_acc;
 	else if(strncmp(kind, "total_set_success", len)==0)
@@ -193,7 +179,7 @@ char** most_popular_keys(int k)
 	char** popular_keys = (char **)xmalloc(k*sizeof(char*));
 	int i;
 	struct node *ptr;
-	//char *pointer;
+	
 	ptr = head;
 	
 	for(i=1; i<num_keys-k-1;i++)
@@ -203,14 +189,10 @@ char** most_popular_keys(int k)
 	while(k>=0)
 	{
 		k--;
-		//pointer=ptr->key;
 		popular_keys[k] = ptr->key;
-		printf("%s\n", ptr->key);
 		ptr = ptr->next; 
 		if(ptr->next == NULL)
 			break;
-	
-
 	}
 	return popular_keys;
 }
