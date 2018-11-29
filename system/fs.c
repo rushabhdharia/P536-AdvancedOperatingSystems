@@ -218,8 +218,71 @@ void fs_printfreemask(void) {
 
 
 int fs_open(char *filename, int flags) {
+	int i, j, check=-1, success;
+	struct inode in;
+	if(flags != O_RDONLY && flags != O_WRONLY && flags != O_RDWR)
+	{
+		printf("Incorrect flag\n");
+		return SYSERR;
+	}
+
+	for(i=0; i<fsd.root_dir.numentries; i++)
+	{
+		if(strncmp(fsd.root_dir.entry[i].name, filename, FILENAMELEN)== 0)
+			break;
+	}
+
+	printf("%d", i);
+
+	if(i >= fsd.root_dir.numentries)
+	{
+		printf("File not found\n");
+		return SYSERR;
+	}
+
+	for(j=0; j<NUM_FD; j++)
+	{
+		if(oft[j].in.id == fsd.root_dir.entry[i].inode_num)
+			break;
+		if(oft[j].state == FSTATE_CLOSED)
+		{
+			check = j;
+		}
+	}	
 	
-  return SYSERR;
+	printf("%d", j);
+
+	if(check == -1)
+	{
+		printf("Could not open file as Open File Table is Full\n");
+	}
+
+	if(oft[j].in.id == fsd.root_dir.entry[i].inode_num)
+	{
+		if(oft[j].state == FSTATE_OPEN)
+		{
+			printf("File is already open\n");
+			return SYSERR;
+		}
+		else //if(ofj[j].state == FSTATE_CLOSED)
+		{
+			check =j;	
+		}
+	}
+	
+	success = fs_get_inode_by_num(0, fsd.root_dir.entry[i].inode_num, &in);
+	if(success == SYSERR)
+	{
+		printf("Could not open file as could not get inode\n");
+		return SYSERR;
+	}
+	
+	oft[check].state = FSTATE_OPEN;
+	oft[check].fileptr = 0;
+	oft[check].de = &fsd.root_dir.entry[i];
+	oft[check].in = in;
+
+ 	return check;
 }
 
 int fs_close(int fd) {
