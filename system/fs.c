@@ -218,6 +218,7 @@ void fs_printfreemask(void) {
 
 
 int fs_open(char *filename, int flags) {
+	
   return SYSERR;
 }
 
@@ -226,7 +227,49 @@ int fs_close(int fd) {
 }
 
 int fs_create(char *filename, int mode) {
-  return SYSERR;
+	int i, success;
+	struct inode in;
+
+	if(mode != O_CREAT)
+	{
+		printf("Incorrect mode\n");
+		return SYSERR;
+	}
+	
+	for(i=0; i<fsd.root_dir.numentries ;i++)
+	{
+		if(strncmp(fsd.root_dir.entry[i].name, filename, FILENAMELEN) == 0)
+		{
+			printf("File already exists\n");
+			return SYSERR;
+		} 
+	}
+
+	if(fsd.inodes_used >= fsd.ninodes)
+	{
+		printf("Could not create file as all inodes are used\n");
+		return SYSERR;
+	}
+
+	success = fs_get_inode_by_num(0, fsd.inodes_used+1, &in);
+	if(success != OK)
+	{
+		printf("Could not create file as could not get inode\n");
+		return SYSERR;
+	}	
+
+	fsd.inodes_used++;
+	fsd.root_dir.numentries++;
+	i = fsd.root_dir.numentries - 1;
+	fsd.root_dir.entry[i].inode_num = fsd.inodes_used;
+	strncpy(fsd.root_dir.entry[i].name, filename, FILENAMELEN);
+
+	i = fs_open(filename, O_RDWR);
+	
+	oft[i].in.type = INODE_TYPE_FILE;
+	oft[i].in.size = 0;
+	
+	return i;
 }
 
 int fs_seek(int fd, int offset) {
