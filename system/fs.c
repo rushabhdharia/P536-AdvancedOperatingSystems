@@ -218,8 +218,8 @@ void fs_printfreemask(void) {
 
 
 int fs_open(char *filename, int flags) {
-	int i, j, check=-1, success;
-	struct inode in;
+	int i, j, success;
+	
 	if(flags != O_RDONLY && flags != O_WRONLY && flags != O_RDWR)
 	{
 		printf("Incorrect flag\n");
@@ -232,8 +232,6 @@ int fs_open(char *filename, int flags) {
 			break;
 	}
 
-	printf("%d", i);
-
 	if(i >= fsd.root_dir.numentries)
 	{
 		printf("File not found\n");
@@ -242,56 +240,69 @@ int fs_open(char *filename, int flags) {
 
 	for(j=0; j<NUM_FD; j++)
 	{
-		if(oft[j].in.id == fsd.root_dir.entry[i].inode_num)
+		if(oft[next_open_fd].state == FSTATE_CLOSED)
+		{
 			break;
-		if(oft[j].state == FSTATE_CLOSED)
-		{
-			check = j;
 		}
+		next_open_fd++;
 	}	
+	if(next_open_fd >= NUM_FD)
+		next_open_fd = 0;
 	
-	printf("%d", j);
-
-	if(check == -1)
+	if(oft[next_open_fd].state == FSTATE_OPEN)
 	{
-		printf("Could not open file as Open File Table is Full\n");
+		if(next_open_fd == 0)
+			printf("Cannot open more files\n");
+		else
+			printf("The file is already open\n");
+		return SYSERR;
 	}
 
-	if(oft[j].in.id == fsd.root_dir.entry[i].inode_num)
-	{
-		if(oft[j].state == FSTATE_OPEN)
-		{
-			printf("File is already open\n");
-			return SYSERR;
-		}
-		else //if(ofj[j].state == FSTATE_CLOSED)
-		{
-			check =j;	
-		}
-	}
+	oft[next_open_fd].state = FSTATE_OPEN;
+	oft[next_open_fd].fileptr = 0;
+	oft[next_open_fd].de = &fsd.root_dir.entry[i];
 	
-	success = fs_get_inode_by_num(0, fsd.root_dir.entry[i].inode_num, &in);
+	success = fs_get_inode_by_num(dev0, fsd.root_dir.entry[i].inode_num, &oft[next_open_fd].in);
 	if(success == SYSERR)
 	{
 		printf("Could not open file as could not get inode\n");
 		return SYSERR;
 	}
-	
-	oft[check].state = FSTATE_OPEN;
-	oft[check].fileptr = 0;
-	oft[check].de = &fsd.root_dir.entry[i];
-	oft[check].in = in;
 
- 	return check;
+ 	return next_open_fd;
 }
 
 int fs_close(int fd) {
+	if(fd<0 || fd> NUM_FD)
+	{
+		printf("Invalid fd");
+		return SYSERR;
+	}
+	
+	if(oft[fd].state == FSTATE_CLOSED)
+	{
+		printf("File is not open");
+		return SYSERR;
+	}
+	else if(oft[fd].state == FSTATE_OPEN)
+	{
+		oft[fd].state = FSTATE_CLOSED;
+		oft[fd].fileptr = 0;
+		return OK;
+	}
+	
   return SYSERR;
 }
 
 int fs_create(char *filename, int mode) {
 	int i, success;
-	struct inode in;
+	struct inode *in;
+
+	if(strlen(filename)>=FILENAMELEN)
+	{
+		printf("Filename exceeds max allowed length");
+		return SYSERR;
+	}
 
 	if(mode != O_CREAT)
 	{
@@ -307,36 +318,62 @@ int fs_create(char *filename, int mode) {
 			return SYSERR;
 		} 
 	}
-
+	
 	if(fsd.inodes_used >= fsd.ninodes)
 	{
 		printf("Could not create file as all inodes are used\n");
 		return SYSERR;
 	}
 
-	success = fs_get_inode_by_num(0, fsd.inodes_used+1, &in);
+	in =(void *) getmem(sizeof(struct inode));
+	in->id = fsd.inodes_used++;
+	in->type = INODE_TYPE_FILE;	
+	in->size = 0;
+	in->nlink = 1;
+	in->device = dev0;
+	
+	success = fs_put_inode_by_num(dev0, fsd.inodes_used-1, in);
 	if(success != OK)
 	{
 		printf("Could not create file as could not get inode\n");
 		return SYSERR;
 	}	
 
-	fsd.inodes_used++;
 	fsd.root_dir.numentries++;
 	i = fsd.root_dir.numentries - 1;
 	fsd.root_dir.entry[i].inode_num = fsd.inodes_used;
 	strncpy(fsd.root_dir.entry[i].name, filename, FILENAMELEN);
 
-	i = fs_open(filename, O_RDWR);
-	
-	oft[i].in.type = INODE_TYPE_FILE;
-	oft[i].in.size = 0;
-	
-	return i;
+	success = fs_open(filename, O_RDWR);
+	if(success == SYSERR)
+	{
+		printf("Couldn't create file");
+		return SYSERR;
+	}	
+
+
+	return OK;
 }
 
 int fs_seek(int fd, int offset) {
-  return SYSERR;
+	
+	int check;
+	if(fd<0 || fd>=NUM_FD)
+	{
+		printf("Invalid fd");
+		return SYSERR;
+	}	
+	
+	check = oft[fd].fileptr+offset;
+	if(check<0 || check>oft[fd].in.size)
+	{
+		printf("Invalid File pointer");
+		return SYSERR;
+	}
+
+	oft[fd].fileptr += offset;
+	
+	return OK;
 }
 
 int fs_read(int fd, void *buf, int nbytes) {
@@ -344,6 +381,32 @@ int fs_read(int fd, void *buf, int nbytes) {
 }
 
 int fs_write(int fd, void *buf, int nbytes) {
+/*		
+
+	if(fd<0 || fd>= NUM_FD)
+	{
+		printf("Invalid fd\n");
+		return SYSERR;
+	}
+
+	if(nbytes < 1)
+	{
+		printf("Cannot write less than 1 byte\n");
+		return SYSERR;
+	}
+
+	if(oft[fd].state != FSTATE_OPEN)
+	{
+		printf("Can't write to file as file is not open\n");
+		return SYSERR;
+	}
+
+
+*/
+	
+	
+	
+	
   return SYSERR;
 }
 
