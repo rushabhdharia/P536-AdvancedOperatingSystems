@@ -1,0 +1,63 @@
+fs_create() - 
+First, we check if the filename does not exceed the max filename length, i.e., FILENAMELEN. Then we check if the mode is O_CREAT. Then we check if the file with the same name is already present in the root directory. Then we check if any inodes are available.
+
+Then we create an inode structure variable(object) and assign it's id to the inode it is in, set its type to INODE_TYPE_FILE, set it's size to 0 (as initially the file doesn't have any data), set it's nlink to 1 (As there is only 1 hard link and 0 soft links) and set its device to dev0. 
+
+Then we call the function fs_put_inode_by_num() to get an inode and write everything from the block cache to the block b1.
+
+Then we increase the number of entries in the root_dir by 1. We update the inode number of the file's entry in the root directory to the number of inodes used and set the entry's name to the filename.
+
+Then we call fs_open() function
+
+
+fs_open() - 
+First, we check if the flags are correct. Then we check if the file is present in the directory. Then we find a file descriptor (FD) for the file which is to be opened. Then we set the filetable variable i.e. oft[FD NUM]'s state to FSTATE_OPEN, set it's fileptr to 0 and de to the corresponding root_dir entry.
+
+Then we call the fs_get_inode_by_num() function to copy everything from block b1 to the block cache and return the next_open_fd
+ 
+
+fs_write() - 
+First, we check if the fd and number of bytes to write are valid. Then we check if the file is open. Then we set the size of the inode of the oft[fd] variable(object) to the value of the fileptr (Useful in keeping track of the appending data). Then we find the blockindex = (fileptr of the file)/(the block size). Then we find the block number = oft[fd].in.block.[blockindex]. Then we find the offset = (fileptr of the file)%(blocksize). 
+
+Then we set the mask bits of the block to be used to write. Then we call the bs_bwrite() function to write from the buffer to the block. Then we find the next free block and repeat the above step till all the bytes requested are written. 
+
+Then we update the inode size and the filepointer so the when we again write to the file we append in the end instead of overwriting.
+
+
+fs_seek() - 
+First, we check if the fd is valid. Then we check if the fileptr to which we will seek is valid before updating the fileptr.
+
+
+fs_read() - 
+First, we check if the fd and number of bytes to read are valid. Then we check if the file is open. Then we find the blockindex = (fileptr of the file)/(the block size). Then we find the block number = oft[fd].in.block.[blockindex]. Then we find the offset = (fileptr of the file)%(blocksize). Then we use the bs_bread() function to read the block and store it in the buffer till we read nbytes. We set the fileptr to the number of bytes read.
+
+
+fs_close() - 
+We check if the fd is valid, then check if the file is open before changing its state to closed and setting it's fileptr to 0. 
+
+
+Lessons Learned:
+Learned about the ext2 file system and how the filesystem, bitmask, inodes and data blocks are used to manipulate files. Also learned how to create, open, write, seek, read and close a file in the filesystem.
+
+
+Output:
+1100000000000000000000000000000100000000000000000000000000000000
+0000000000000000000000000010000100001000000000000000000000000000
+0000000000000000000000000010000100001000000000000000000000000000
+0000000000000000000000000010000100001000000000000000000000000000
+0000000000000000000000000010000100001000000000000000000000000000
+0000000000000000000000000011111111111000000000000000000000000000
+0000000000000000000000000000000100000000000000000000000000000000
+0000000000000000000000000000000100000000000000000000000000000000
+
+1100000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+
+
+Content of file !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJ!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJ

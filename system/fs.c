@@ -350,7 +350,7 @@ int fs_create(char *filename, int mode) {
 	i = fsd.root_dir.numentries-1;
 	fsd.root_dir.entry[i].inode_num = fsd.inodes_used-1;
 	strncpy(fsd.root_dir.entry[i].name, filename, FILENAMELEN);
-	fsd.root_dir.numentries++;
+	//fsd.root_dir.numentries++;
 
 	return fs_open(filename, O_RDWR);
 	
@@ -425,14 +425,7 @@ int fs_read(int fd, void *buf, int nbytes)
 		count += temp;	
 		oft[fd].fileptr += temp;
 		nbytes -= temp;
-		blockindex += 1;
-		offset = 0;
-				
-		if(blockno == -1)
-		{
-			printf("Couldn't read block\n");
-			return SYSERR;
-		}			
+		offset = 0;			
 	}
 	return count;	
 }
