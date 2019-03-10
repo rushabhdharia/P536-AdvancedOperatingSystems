@@ -1,5 +1,20 @@
-# Welcome to Xinu
+# Assignments
+Assignment 1  
+Part 1 - Getting familiar with Xinu OS.  
+Part 2 - Build a simple echo command for Xinu Shell  
+Part 3 - Report  
 
-# Build instructions
+Assignment 2  
+MultiThreaded Grep  
 
-Copy the file config/Makedefs.EXAMPLE to config/Makedefs and make appropriate changes if necessary.
+Assignment 3  
+Futures and Promises  
+
+Assignment 4  
+Segregated Memory Allocation    
+
+Assignment 5  
+Key-Value Store  
+
+Assignment 6  
+RAM FileSystem   
